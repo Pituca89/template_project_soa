@@ -22,7 +22,7 @@ jobs:
 
       - name: Find Java files with single-line comments
         run: |
-          grep -rn '//' --include='*.java' .; then exit 1; else exit 0; fi
+          if grep -rn '//' --include='*.java' .; then exit 1; else exit 0; fi
         continue-on-error: false
 
       - name: Find Java files with block comments
