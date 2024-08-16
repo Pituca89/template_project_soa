@@ -6,13 +6,34 @@ name: "SOA Workflow"
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches-ignore:
+      - main
+      - develop
   pull_request:
     branches: [ "main" ]
     
   workflow_dispatch:
 
 jobs:
+  validate-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get branch name
+        id: get_branch_name
+        run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
+
+      - name: Validate branch name
+        run: |
+          branch_name=${{ steps.get_branch_name.outputs.branch }}
+          echo "Current branch: $branch_name"
+
+          # Expresión regular para validar el nombre de la rama
+          if [[ ! $branch_name =~ ^feature\/[a-zA-Z0-9._-]+$ ]]; then
+            echo "Branch name does not match the required pattern."
+            exit 1
+          fi
+          
   check-comments:
     name: "Run Check Comments"
     runs-on: ubuntu-latest
@@ -47,4 +68,4 @@ jobs:
 
     - name: Run tests
       run: |
-        ./gradlew test
+        ./gradlew tests
