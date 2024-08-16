@@ -29,7 +29,6 @@ jobs:
           branch_name=${{ steps.get_branch_name.outputs.branch }}
           echo "Current branch: $branch_name"
 
-          # Expresión regular para validar el nombre de la rama
           if [[ ! $branch_name =~ ^feature\/[a-zA-Z0-9._-]+$ ]]; then
             echo "Branch name does not match the required pattern."
             exit 1
