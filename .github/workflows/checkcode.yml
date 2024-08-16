@@ -16,6 +16,7 @@ on:
 
 jobs:
   validate-branch:
+    name: "Run Validate Branch"
     runs-on: ubuntu-latest
 
     steps:
@@ -33,10 +34,11 @@ jobs:
             echo "Branch name does not match the required pattern."
             exit 1
           fi
-          
+
   check-comments:
     name: "Run Check Comments"
     runs-on: ubuntu-latest
+    needs: validate-branch
 
     steps:
       - uses: actions/checkout@v4
