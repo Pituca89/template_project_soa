@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int main() {
+int main() 
+{
     int num1, num2, sum;
 
     printf("Introduce el primer número: ");

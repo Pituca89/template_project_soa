@@ -1,6 +1,7 @@
 #include <iostream>
 
-int main() {
+int main() 
+{
     int num1, num2, sum;
 
     std::cout << "Introduce el primer número: ";
