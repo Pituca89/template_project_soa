@@ -4,7 +4,6 @@ name: "SOA Workflow"
 
 # Controls when the workflow will run
 on:
-  
   push:
     branches-ignore:
       - main
@@ -25,6 +24,7 @@ jobs:
         run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
 
       - name: Validate branch name
+        if: ${{ !contains(github.ref, 'refs/pull/') || github.head_ref != 'develop' }}
         run: |
           branch_name=${{ steps.get_branch_name.outputs.branch }}
           echo "Current branch: $branch_name"
