@@ -10,7 +10,7 @@ jobs:
       - name: Verificar nombre de la rama
         run: |
             BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
-            if [[ ! "$BRANCH_NAME" =~ ^(feature)/ ] || [ ! "$BRANCH_NAME" =~ ^(release)/[0-9]\.[0-9]\.[0-9] ]]; then
+            if [[ ! "$BRANCH_NAME" =~ ^(feature)/ || ! "$BRANCH_NAME" =~ ^(release)/[0-9]\.[0-9]\.[0-9] ]]; then
                 echo "Error: El nombre de la rama '$BRANCH_NAME' no cumple con el formato esperado."
                 exit 1
             fi
@@ -43,6 +43,7 @@ jobs:
 
   # Fallar si ninguna condición es válida
   invalid-pr:
+    needs: [release-to-main, develop-to-release, feature-to-develop]
     runs-on: ubuntu-latest
     if: |
       !(
