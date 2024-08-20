@@ -1,7 +1,9 @@
 name: GitFlow Branch Protection
 
 on:
-  pull_request:
+  push:
+    branches: 
+        - "*"
 
 jobs:
   validate-branch-name:
