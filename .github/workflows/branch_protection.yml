@@ -1,0 +1,74 @@
+name: GitFlow Branch Protection
+
+on:
+  push:
+    branches: 
+        - "*"
+
+jobs:
+  validate-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar nombre de la rama
+        run: |
+            # Obtener el nombre de la referencia
+            REF_NAME="${GITHUB_REF#refs/}"
+
+            # Verificar si la referencia es una rama
+            if [[ "$GITHUB_REF" == refs/heads/* ]]; then
+                BRANCH_NAME="${REF_NAME#heads/}"
+
+                # Validar el nombre de la rama
+                if [[ ! "$BRANCH_NAME" =~ ^(feature/) || ! "$BRANCH_NAME" =~ ^(release/[0-9]+\.[0-9]+\.[0-9]+) ]]; then
+                echo "Error: El nombre de la rama '$BRANCH_NAME' no cumple con el formato esperado."
+                exit 1
+                fi
+            elif [[ "$GITHUB_REF" == refs/pull/* ]]; then
+                echo "Error: El flujo de trabajo no debe ejecutarse en pull requests."
+                exit 1
+            else
+                echo "Error: Tipo de referencia no soportado: '$GITHUB_REF'."
+                exit 1
+            fi
+  # Validación para feature/* a develop
+  feature-to-develop:
+    needs: validate-branch-name
+    if: startsWith(github.head_ref, 'feature/') && github.base_ref == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR from feature/* to develop
+        run: echo "Valid PR -> feature/* to develop."
+
+  # Validación para develop a release/*
+  develop-to-release:
+    needs: validate-branch-name
+    if: github.head_ref == 'develop' && startsWith(github.base_ref, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR from develop to release/*
+        run: echo "Valid PR -> develop to release/*."
+
+  # Validación para release/* a main
+  release-to-main:
+    needs: validate-branch-name
+    if: startsWith(github.head_ref, 'release/') && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR from release/* to main
+        run: echo "Valid PR -> release/* to main."
+
+  # Fallar si ninguna condición es válida
+  invalid-pr:
+    needs: [release-to-main, develop-to-release, feature-to-develop]
+    runs-on: ubuntu-latest
+    if: |
+      !(
+        (startsWith(github.head_ref, 'feature/') && github.base_ref == 'develop') ||
+        (github.head_ref == 'develop' && startsWith(github.base_ref, 'release/')) ||
+        (startsWith(github.head_ref, 'release/') && github.base_ref == 'main')
+      )
+    steps:
+      - name: Invalidate PR
+        run: |
+          echo "Invalid PR: This PR does not follow the GitFlow branch rules."
+          exit 1
