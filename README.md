@@ -1,2 +1,2 @@
 # template_project_soa
-Proyecto template con CICD para sistemas operativos avanzados y concurrentes
+Proyecto template con CDCI para SOA (Sistemas Operativos Avanzados) y PROG-C (Programación Concurrente).
